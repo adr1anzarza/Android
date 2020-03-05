@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
+import com.example.android.trackmysleepquality.database.SleepNightAdapter
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
 import com.google.android.material.snackbar.Snackbar
 
@@ -59,9 +60,13 @@ class SleepTrackerFragment : Fragment() {
                 ViewModelProviders.of(
                         this, viewModelFactory).get(SleepTrackerViewModel::class.java)
 
+        val adapter = SleepNightAdapter()
+
         binding.sleepTrackerViewModel = sleepTrackerViewModel
 
         binding.setLifecycleOwner(this)
+
+        binding.sleepList.adapter = adapter
 
         // Add an Observer on the state variable for showing a Snackbar message
         // when the CLEAR button is pressed.
@@ -95,6 +100,13 @@ class SleepTrackerFragment : Fragment() {
                 // has a configuration change.
                 sleepTrackerViewModel.doneNavigating()
             }
+        })
+
+        sleepTrackerViewModel.nights.observe(viewLifecycleOwner, Observer {sleepNightList->
+            sleepNightList?.let {
+                adapter.submitList(it)
+            }
+
         })
 
         return binding.root
